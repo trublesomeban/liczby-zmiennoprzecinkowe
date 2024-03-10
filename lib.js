@@ -130,5 +130,5 @@ function hex(bits) {
     }
 }
 
-console.log(revert("10011011"))
+console.log(convert("-65"))
 
