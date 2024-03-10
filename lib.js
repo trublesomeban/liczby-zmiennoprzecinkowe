@@ -124,6 +124,6 @@ function hex(bits) {
         let second = _HEX[h_idx]
         return first + second
     }
-}mit
+}
 
 console.log(convert("-126"))
