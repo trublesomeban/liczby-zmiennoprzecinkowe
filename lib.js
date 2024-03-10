@@ -64,6 +64,23 @@ function convert(data) {
 
 }
 
+function revert(data) {
+    let isNegative = false;
+    if (data[0] == "1") {
+        isNegative = true
+    }
+    let result = 0
+    if (data.includes(".")) {
+
+    } else {
+        for (let i = 1; i <= 7; i++) {
+            if (data[i] == "1") {
+                result += (2 ** (7 - i))
+            }
+        }
+    }
+    return result * (isNegative ? -1 : 1)
+}
 /// Odwraca bity stringa zawierającego zera i jedynki
 /// Np. invert("00111") == "11000"
 function invert(bits) {
@@ -71,29 +88,16 @@ function invert(bits) {
 }
 
 function inc(bits) {
-    let _bits = bits.split("")
-    let carry = false;
-    for (let i = bits.length - 1; i > 1; --i) {
-
-        if (i == bits.length - 1) {
-            if (_bits[i] == "1") {
-                _bits[i] = "0"
-                carry = true
-            } else if (_bits[i] == "0") {
-                _bits[i] = "1"
-                carry = false
-            }
-        } else if (carry == true) {
-            if (_bits[i] == "1") {
-                _bits[i] = "0"
-                carry = true
-            } else if (_bits[i] == "0") {
-                _bits[i] = "1"
-                carry = false
-            }
+    let arr = bits.split("");
+    for (let i = arr.length - 1; i >= 0; i--) {
+        if (arr[i] == "1") {
+            arr[i] = "0";
+        } else {
+            arr[i] = "1";
+            break;
         }
     }
-    return _bits.join("")
+    return arr.join("");
 }
 
 const _HEX = "0123456789ABCDEF"
@@ -126,4 +130,5 @@ function hex(bits) {
     }
 }
 
-console.log(convert("-126"))
+console.log(revert("10011011"))
+
