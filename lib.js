@@ -129,6 +129,3 @@ function hex(bits) {
         return first + second
     }
 }
-
-console.log(convert("-65"))
-
