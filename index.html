@@ -25,6 +25,11 @@
             font-family: 'Fira Code';
             padding: 5px;
             margin-bottom: 10px;
+            background-color: transparent;
+            outline: none;
+            border: none;
+            color: deepskyblue;
+
         }
 
         button {
@@ -44,17 +49,24 @@
         #result {
             margin-top: 20px;
         }
+
+        .tbox {
+            border-radius: 10px;
+            display: inline-block;
+            padding: 0.5% 0.5% 0.5% 0.5%;
+            background-color: #4CAF50;
+        }
     </style>
 </head>
 
 <body>
-    <h2>KONWERSJA LICZB</h2>
+    <div class="tbox">KONWERSJA LICZB |></div>
     <label for="numberInput">Wprowadź liczbę dziesiętną:</label>
     <input type="text" id="numberInput" placeholder="np., -65">
-
-    <button id="btn">Konwertuj |></button>
-
-    <div id="result"></div>
+    <div id="result1"></div>
+    <label for="numberInput">... lub liczbę binarną znak-moduł:</label>
+    <input type="text" id="binaryInput" placeholder="np., 11000101">
+    <div id="result2"></div>
     <script defer>
         /// Parametr `data` powinien być liczbą dziesiętną
         /// Funkcja zwraca obiekt zawierający trzy pola będące różnymi zapisami liczby w sposób binarny 
@@ -128,12 +140,25 @@
                 isNegative = true
             }
             let result = 0
+
             if (data.includes(".")) {
+                let point = data.indexOf(".")
+                const [first, second] = data.slice(1).split(".")
+                for (let i = 0; i <= first.length; i++) {
+                    if (first[i] == "1") {
+                        result += (2 ** (first.length - i - 1))
+                    }
+                }
+                for (let i = 0; i <= second.length; i++) {
+                    if (second[i] == "1") {
+                        result += (2 ** (-i - 1))
+                    }
+                }
 
             } else {
-                for (let i = 1; i <= 7; i++) {
+                for (let i = 1; i <= data.length; i++) {
                     if (data[i] == "1") {
-                        result += (2 ** (7 - i))
+                        result += (2 ** (data.length - i - 1))
                     }
                 }
             }
@@ -187,20 +212,37 @@
                 return first + second
             }
         }
-        const btn = document.getElementById("btn")
-        btn.addEventListener("click", function () {
-            console.log("test")
+        const inp2 = document.getElementById("binaryInput")
+        inp2.addEventListener("input", function () {
+            const bin = document.getElementById('binaryInput').value;
+            const resultDiv = document.getElementById('result2');
+            // Validate the input
+            if (!/^([01]+(.[01]+)?$)/.test(bin)) {
+                resultDiv.innerHTML = '<p style="color:red;">Proszę wprowadzić poprawną liczbę w systemie znak moduł.</p>';
+                return;
+            }
+
+            // Call the convert function
+            const conversionResult = revert(bin);
+
+            // Display the result
+            resultDiv.innerHTML = `
+        <p>Dziesiętna: ${conversionResult}</p>
+        `;
+        }, false)
+        const inp1 = document.getElementById("numberInput")
+        inp1.addEventListener("input", function () {
             const numberInput = document.getElementById('numberInput').value;
-            const resultDiv = document.getElementById('result');
+            const resultDiv = document.getElementById('result1');
             console.log(numberInput)
             // Validate the input
             if (!numberInput || isNaN(parseFloat(numberInput))) {
                 resultDiv.innerHTML = '<p style="color:red;">Proszę wprowadzić poprawną liczbę.</p>';
                 return;
             }
-
-            if (numberInput > 127 || numberInput < -127) {
-                resultDiv.innerHTML = '<p style="color:red;">Liczba zbyt duża lub zbyt mała</p>';
+            const floatOutOfRange = parseFloat(numberInput) != parseInt(numberInput) && (numberInput > 15.9375 || numberInput < -15.9375);
+            if (numberInput > 127 || numberInput < -127 || floatOutOfRange) {
+                resultDiv.innerHTML = '<p style="color:red;">Proszę wprowadzić liczbę z zakresu -127..127 lub -15.9375..15.9375 w przypadku liczby z przecinkiem</p>';
                 return;
             }
 
@@ -212,10 +254,10 @@
         <p>Znak-Moduł: ${conversionResult.zm}</p>
         <p>Uzupełnienie do Jeden: ${conversionResult.u1}</p>
         <p>Uzupełnienie do Dwóch: ${conversionResult.u2}</p>
-        <p>System Heksadecymalny: ${hex(conversionResult.zm)}</p>
         
     `;
         }, false)
+
     </script>
 </body>
 
