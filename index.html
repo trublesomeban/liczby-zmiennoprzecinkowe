@@ -8,12 +8,18 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap');
 
+
         body {
             font-family: 'Fira Code';
             text-align: center;
             margin: 20px;
             color: aliceblue;
-            background-color: hsl(257, 11%, 14%);
+            background-color: black;
+            overflow-x: hidden;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
         }
 
         label {
@@ -56,7 +62,10 @@
             top: 0;
             left: 0;
             width: 100%;
-            background-color: hsl(257, 11%, 12%);
+            background-color: black;
+            border: solid;
+            border-color: white;
+            border-width: 1px;
         }
 
         .tbox {
@@ -71,6 +80,18 @@
         .main {
             margin: 10.5%;
             font-size: 150%;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            padding: 2%;
+            background-color: black;
+            border: solid;
+            border-color: white;
+            border-width: 1px;
         }
     </style>
 </head>
@@ -87,14 +108,19 @@
         <input type="text" id="binaryInput" placeholder="np., 11000101">
         <div id="result2"></div>
         <div id="result2"></div>
-        <label for="numberInput">Albo wybierz spośród dokładnie <span style="color:blueviolet; font-weight: bold;">tysiąca stu dziewięćdziesięciu</span> (tak, liczyłem) innych szablonów przygotowanych przez naszych
+        <label for="numberInput">Albo wybierz spośród dokładnie <span
+                style="color:blueviolet; font-weight: bold;">tysiąca stu dziewięćdziesięciu</span> (tak, liczyłem)
+            innych szablonów przygotowanych przez naszych
             projektantów:</label>
         Baza początkowa: <input type="text" id="originBase" placeholder="np., 3">
         ==> Baza docelowa: <input type="text" id="targetBase" placeholder="np., 16">
         <br>
         <button id="newConverter" style="font-size: 25px">Stwórz swój własny konwerter! |></button>
         <div id="niccer"></div>
+        <br>
         <div id="converters"></div>
+        <footer>Projekt pod patronatem fundacji OtwartaSI<br>Zrealizowali Antoni B. oraz Krzysztof B.<br>Z uwagi na
+            kolor strony wszelkie prawa nie są strzeżone</footer>
     </div>
     <script defer>
 
