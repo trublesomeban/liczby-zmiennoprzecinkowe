@@ -13,7 +13,7 @@
             text-align: center;
             margin: 20px;
             color: aliceblue;
-            background-color: rgb(29, 27, 34);
+            background-color: hsl(257, 11%, 14%);
         }
 
         label {
@@ -29,6 +29,7 @@
             outline: none;
             border: none;
             color: deepskyblue;
+            width: 7%;
 
         }
 
@@ -50,24 +51,53 @@
             margin-top: 20px;
         }
 
+        .headbox {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: hsl(257, 11%, 12%);
+        }
+
         .tbox {
-            border-radius: 10px;
+            /* border-radius: 10px; */
             display: inline-block;
             padding: 0.5% 0.5% 0.5% 0.5%;
-            background-color: #4CAF50;
+
+            margin: 1%;
+            font-size: 400%;
+        }
+
+        .main {
+            margin: 10.5%;
+            font-size: 150%;
         }
     </style>
 </head>
 
 <body>
-    <div class="tbox">KONWERSJA LICZB |></div>
-    <label for="numberInput">Wprowadź liczbę dziesiętną:</label>
-    <input type="text" id="numberInput" placeholder="np., -65">
-    <div id="result1"></div>
-    <label for="numberInput">... lub liczbę binarną znak-moduł:</label>
-    <input type="text" id="binaryInput" placeholder="np., 11000101">
-    <div id="result2"></div>
+    <div class="headbox">
+        <div class="tbox">KONWERSJA LICZB</div>
+    </div>
+    <div class="main">
+        <label for="numberInput">Wprowadź liczbę dziesiętną:</label>
+        <input type="text" id="numberInput" placeholder="np., -65">
+        <div id="result1"></div>
+        <label for="numberInput">... lub liczbę binarną znak-moduł:</label>
+        <input type="text" id="binaryInput" placeholder="np., 11000101">
+        <div id="result2"></div>
+        <div id="result2"></div>
+        <label for="numberInput">Albo wybierz spośród miliona innych szablonów przygotowanych przez naszych
+            projektantów:</label>
+        Baza początkowa: <input type="text" id="originBase" placeholder="np., 3">
+        ==> Baza docelowa: <input type="text" id="targetBase" placeholder="np., 16">
+        <br>
+        <button id="newConverter" style="font-size: 25px">Stwórz swój własny konwerter! |></button>
+        <div id="niccer"></div>
+        <div id="converters"></div>
+    </div>
     <script defer>
+
         /// Parametr `data` powinien być liczbą dziesiętną
         /// Funkcja zwraca obiekt zawierający trzy pola będące różnymi zapisami liczby w sposób binarny 
         /// Dla przykładu:
@@ -75,6 +105,26 @@
         /// `out.zm` zapis w systemie znak-moduł
         /// `out.u1` zapis w systemie uzupełnienia do jeden
         /// `out.u2` zapis w systemie uzupełnienia do dwóch
+
+        function convertBase(number, fromBase, toBase) {
+            const parts = number.toString().split('.');
+            const integerPart = parseInt(parts[0], fromBase);
+            let fractionalPart = 0;
+            if (parts.length === 2) {
+                const fractionalString = parts[1];
+                let power = -1;
+                for (let i = 0; i < fractionalString.length; i++) {
+                    fractionalPart += parseInt(fractionalString[i], fromBase) * Math.pow(fromBase, power);
+                    power--;
+                }
+            }
+            const decimalIntegerPart = integerPart;
+            const decimalFractionalPart = fractionalPart;
+            const decimalNumber = decimalIntegerPart + decimalFractionalPart;
+            const convertedNumber = decimalNumber.toString(toBase);
+
+            return convertedNumber;
+        }
         function convert(data) {
             data = data.toString()
             let check = parseFloat(data);
@@ -103,8 +153,7 @@
                         basic += "."
                     }
                 }
-                let zm = basic;
-                zm[0] = isNegative ? "1" : "0"
+                let zm = (isNegative ? "1" : "0") + basic.slice(1, basic.length)
                 let u1 = isNegative ? invert(basic) : basic
                 u1 = u1.slice(0, 4) + u1.slice(4)
                 let u2 = isNegative ? inc(invert(zm)) : zm
@@ -212,26 +261,51 @@
                 return first + second
             }
         }
-        const inp2 = document.getElementById("binaryInput")
-        inp2.addEventListener("input", function () {
-            const bin = document.getElementById('binaryInput').value;
-            const resultDiv = document.getElementById('result2');
-            // Validate the input
-            if (!/^([01]+(.[01]+)?$)/.test(bin)) {
-                resultDiv.innerHTML = '<p style="color:red;">Proszę wprowadzić poprawną liczbę w systemie znak moduł.</p>';
+
+        const makeConverter = function () {
+            const originBase = document.getElementById('originBase').value;
+            const targetBase = document.getElementById('targetBase').value;
+            const oBOOR = originBase < 2 || originBase > 36 || originBase != parseInt(originBase.toString())
+            const tBOOR = targetBase < 2 || targetBase > 36 || targetBase != parseInt(targetBase.toString())
+            const oBOOR_message = `<p style="color:red;">Baza początkowa powinna być liczbą całkowitą z zakresu 2 do 36</p>`
+            const tBOOR_message = `<p style="color:red;">Baza docelowa powinna być liczbą całkowitą z zakresu 2 do 36</p>`
+            let error = (oBOOR ? oBOOR_message : "") + "<br>" + (tBOOR ? tBOOR_message : "")
+            const niccer = document.getElementById("niccer")
+            if (oBOOR || tBOOR) {
+                niccer.innerHTML = error
                 return;
             }
+            else {
+                niccer.innerHTML = ""
+            }
+            const converters = document.getElementById('converters');
+            const converter = document.createElement("div");
+            const uuid = crypto.randomUUID()
+            function updateUnique() {
+                const chars = "0123456789abcdefghijklmnopqrstuvwxyz"
+                const legal = chars.slice(0, originBase)
+                const inp = document.getElementById(`input-${uuid}`).value;
+                const out = document.getElementById(`result-${uuid}`)
+                for (i = 0; i < inp.length; i++) {
+                    if (!legal.includes(inp[i]) && inp[i] != ".") {
+                        out.innerHTML = `<p style="color:red;">Liczba powinna składać się wyłącznie z przecinka oraz następujących cyfr: ${chars.slice(0, originBase)}</p>`
+                        return
+                    }
+                }
+                const res = convertBase(inp, originBase, targetBase)
+                out.innerHTML = res
+            }
+            converter.innerHTML = `
+        <div id="${uuid}">
+        <input type="text" id="input-${uuid}" placeholder="..."> (Baza ${originBase}) = <span id="result-${uuid}"></span> (Baza ${targetBase})
+        </div>
+        <br>
+            `
+            converters.addEventListener("input", updateUnique, false)
+            converters.appendChild(converter);
+        }
 
-            // Call the convert function
-            const conversionResult = revert(bin);
-
-            // Display the result
-            resultDiv.innerHTML = `
-        <p>Dziesiętna: ${conversionResult}</p>
-        `;
-        }, false)
-        const inp1 = document.getElementById("numberInput")
-        inp1.addEventListener("input", function () {
+        const updateInp1 = function (rec) {
             const numberInput = document.getElementById('numberInput').value;
             const resultDiv = document.getElementById('result1');
             console.log(numberInput)
@@ -254,9 +328,38 @@
         <p>Znak-Moduł: ${conversionResult.zm}</p>
         <p>Uzupełnienie do Jeden: ${conversionResult.u1}</p>
         <p>Uzupełnienie do Dwóch: ${conversionResult.u2}</p>
-        
-    `;
-        }, false)
+        `;
+            const inp2 = document.getElementById("binaryInput")
+            inp2.setAttribute("value", conversionResult.zm)
+        }
+
+        const updateInp2 = function (rec) {
+            const bin = document.getElementById('binaryInput').value;
+            const resultDiv = document.getElementById('result2');
+            // Validate the input
+            if (!/^([01]+(.[01]+)?$)/.test(bin)) {
+                resultDiv.innerHTML = '<p style="color:red;">Proszę wprowadzić poprawną liczbę w systemie znak moduł.</p>';
+                return;
+            }
+
+            // Call the convert function
+            const conversionResult = revert(bin);
+
+            // Display the result
+            resultDiv.innerHTML = `
+        <p>Dziesiętna: ${conversionResult}</p>
+        `;
+            const inp1 = document.getElementById("numberInput")
+            inp1.setAttribute("value", conversionResult)
+            if (rec != true) updateInp1(true)
+        }
+        const inp1 = document.getElementById("numberInput")
+        const inp2 = document.getElementById("binaryInput")
+        const make = document.getElementById("newConverter")
+        inp1.addEventListener("input", updateInp1, false)
+        inp2.addEventListener("input", updateInp2, false)
+        make.addEventListener("click", makeConverter)
+
 
     </script>
 </body>
